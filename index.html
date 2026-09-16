@@ -1,0 +1,2010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LexChain · On-Chain Agreement Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:        #08111C;
+  --surface:   #0F1D2E;
+  --card:      #132030;
+  --border:    #1E3348;
+  --border-lt: #2A4560;
+  --text:      #C8D8E8;
+  --muted:     #5C7A96;
+  --dim:       #3A5570;
+  --gold:      #D4A843;
+  --gold-lt:   #ECC968;
+  --gold-dk:   #A07820;
+  --green:     #3DBE7A;
+  --red:       #E05252;
+  --amber:     #E09B3D;
+  --blue:      #4A9EE0;
+  --paper:     #F6F3EE;
+  --ink:       #18181A;
+  --r:         5px;
+}
+
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 48px;height:64px;
+  background:rgba(8,17,28,.85);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  font-family:'Playfair Display',serif;
+  font-size:1.4rem;color:var(--text);
+  cursor:pointer;
+  letter-spacing:-.3px;
+}
+.nav-logo em{color:var(--gold);font-style:normal}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-link{
+  font-size:.82rem;font-weight:500;color:var(--muted);
+  cursor:pointer;border:none;background:none;
+  transition:color .2s;padding:4px 0;
+}
+.nav-link:hover,.nav-link.active{color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.btn-wallet{
+  display:flex;align-items:center;gap:7px;
+  padding:8px 16px;border:1px solid var(--gold);
+  background:transparent;color:var(--gold);
+  font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:500;
+  border-radius:var(--r);cursor:pointer;transition:all .2s;
+}
+.btn-wallet:hover,.btn-wallet.connected{background:var(--gold);color:var(--bg)}
+.w-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);transition:background .3s}
+.btn-wallet.connected .w-dot{background:var(--green)}
+.chain-pill{
+  font-size:.68rem;padding:3px 9px;
+  border-radius:20px;border:1px solid var(--border-lt);
+  color:var(--muted);display:none;
+}
+/* ── PAGES ── */
+.page{display:none;min-height:100vh;padding-top:64px}
+.page.active{display:block}
+
+/* ════════════════════════════════
+   LANDING
+════════════════════════════════ */
+#page-landing{background:var(--bg)}
+
+/* Hero */
+.hero{
+  display:flex;flex-direction:column;align-items:center;
+  text-align:center;
+  padding:120px 48px 80px;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(212,168,67,.07) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:.72rem;font-weight:600;color:var(--gold);
+  letter-spacing:.8px;margin-bottom:28px;
+  padding:6px 14px;border:1px solid rgba(212,168,67,.25);
+  border-radius:20px;background:rgba(212,168,67,.06);
+}
+.hero-eyebrow span{width:5px;height:5px;border-radius:50%;background:var(--gold);display:inline-block}
+.hero-h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.8rem,5vw,4.4rem);
+  color:var(--text);line-height:1.1;
+  max-width:720px;margin:0 auto 20px;
+  font-weight:700;
+}
+.hero-h1 i{color:var(--gold);font-style:italic}
+.hero-sub{
+  font-size:1.05rem;color:var(--muted);
+  max-width:520px;margin:0 auto 44px;
+  line-height:1.7;font-weight:300;
+}
+.hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-primary{
+  padding:13px 28px;
+  background:var(--gold);border:none;border-radius:var(--r);
+  color:var(--bg);font-family:'DM Sans',sans-serif;
+  font-weight:600;font-size:.9rem;cursor:pointer;
+  transition:background .2s,transform .15s;
+}
+.btn-primary:hover{background:var(--gold-lt);transform:translateY(-1px)}
+.btn-primary:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;transform:none}
+.btn-secondary{
+  padding:13px 28px;
+  background:transparent;border:1px solid var(--border-lt);
+  border-radius:var(--r);color:var(--text);
+  font-family:'DM Sans',sans-serif;
+  font-weight:500;font-size:.9rem;cursor:pointer;
+  transition:border-color .2s,color .2s;
+}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+
+/* Stats strip */
+.stats-strip{
+  display:flex;justify-content:center;gap:0;
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  background:var(--surface);
+}
+.stat-item{
+  flex:1;max-width:220px;
+  padding:28px 24px;
+  border-right:1px solid var(--border);
+  text-align:center;
+}
+.stat-item:last-child{border-right:none}
+.stat-num{
+  font-family:'Playfair Display',serif;
+  font-size:2rem;font-weight:600;color:var(--gold);
+  line-height:1;margin-bottom:4px;
+}
+.stat-lbl{font-size:.75rem;color:var(--muted);font-weight:400}
+
+/* How it works */
+.section{padding:88px 48px;max-width:1100px;margin:0 auto}
+.section-head{
+  display:flex;align-items:baseline;gap:20px;
+  margin-bottom:52px;
+}
+.section-h2{
+  font-family:'Playfair Display',serif;
+  font-size:2rem;color:var(--text);font-weight:600;
+  line-height:1.2;
+}
+.section-rule{flex:1;height:1px;background:var(--border)}
+.steps-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  background:var(--border);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;
+}
+.step-col{
+  background:var(--card);
+  padding:32px 24px;
+  display:flex;flex-direction:column;gap:14px;
+}
+.step-num-large{
+  font-family:'Playfair Display',serif;
+  font-size:2.6rem;color:var(--border-lt);font-weight:700;
+  line-height:1;
+}
+.step-icon{font-size:1.6rem;margin-bottom:4px}
+.step-title{font-size:.92rem;font-weight:600;color:var(--text)}
+.step-body{font-size:.8rem;color:var(--muted);line-height:1.6}
+
+/* Features */
+.features-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
+}
+.feat-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:28px 24px;
+  transition:border-color .2s;
+}
+.feat-card:hover{border-color:var(--gold-dk)}
+.feat-icon{
+  width:40px;height:40px;border-radius:var(--r);
+  background:rgba(212,168,67,.1);border:1px solid rgba(212,168,67,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;margin-bottom:16px;
+}
+.feat-title{font-size:.9rem;font-weight:600;color:var(--text);margin-bottom:6px}
+.feat-body{font-size:.78rem;color:var(--muted);line-height:1.6}
+
+/* Agreement types section */
+.types-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.type-pill{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:20px 16px;
+  text-align:center;cursor:pointer;
+  transition:border-color .2s,background .2s;
+}
+.type-pill:hover{border-color:var(--gold);background:rgba(212,168,67,.05)}
+.type-pill-icon{font-size:1.8rem;margin-bottom:8px}
+.type-pill-name{font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:3px}
+.type-pill-desc{font-size:.72rem;color:var(--muted)}
+
+/* CTA banner */
+.cta-banner{
+  margin:0 48px 88px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:56px 48px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:32px;
+  position:relative;overflow:hidden;
+}
+.cta-banner::before{
+  content:'';position:absolute;top:-40px;right:-40px;
+  width:240px;height:240px;border-radius:50%;
+  background:radial-gradient(circle,rgba(212,168,67,.1) 0%,transparent 70%);
+  pointer-events:none;
+}
+.cta-text h3{
+  font-family:'Playfair Display',serif;
+  font-size:1.7rem;color:var(--text);margin-bottom:8px;
+}
+.cta-text p{font-size:.85rem;color:var(--muted);max-width:380px;line-height:1.6}
+
+/* Footer */
+footer{
+  border-top:1px solid var(--border);
+  padding:32px 48px;
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:.75rem;color:var(--muted);
+}
+
+/* ════════════════════════════════
+   CREATE AGREEMENT
+════════════════════════════════ */
+#page-create{background:var(--bg)}
+.create-wrap{
+  max-width:1100px;margin:0 auto;
+  padding:48px 48px;
+  display:grid;grid-template-columns:400px 1fr;gap:32px;
+  align-items:start;
+}
+.create-left{position:sticky;top:88px}
+.page-heading{
+  font-family:'Playfair Display',serif;
+  font-size:1.8rem;color:var(--text);margin-bottom:6px;
+}
+.page-sub{font-size:.82rem;color:var(--muted);line-height:1.6;margin-bottom:28px}
+
+.form-panel{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;
+}
+.form-section{padding:24px;border-bottom:1px solid var(--border)}
+.form-section:last-child{border-bottom:none}
+.form-section-label{
+  font-size:.7rem;font-weight:600;color:var(--gold);
+  letter-spacing:.8px;margin-bottom:16px;
+  text-transform:uppercase;
+}
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.field label{
+  display:block;font-size:.72rem;
+  font-weight:500;color:var(--muted);
+  margin-bottom:5px;
+}
+.field input,.field textarea,.field select{
+  width:100%;padding:9px 12px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:.82rem;
+  outline:none;transition:border-color .2s;resize:vertical;
+}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--gold)}
+.field select option{background:var(--bg)}
+.field textarea{min-height:80px}
+.field-hint{font-size:.66rem;color:var(--dim);margin-top:4px;line-height:1.5}
+
+.type-grid-sm{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.type-sm{
+  padding:12px;border:1px solid var(--border);
+  border-radius:var(--r);cursor:pointer;
+  transition:border-color .2s,background .2s;
+  background:var(--surface);
+}
+.type-sm:hover{border-color:var(--gold-dk)}
+.type-sm.active{border-color:var(--gold);background:rgba(212,168,67,.08)}
+.type-sm-icon{font-size:1.2rem;margin-bottom:4px}
+.type-sm-name{font-size:.76rem;font-weight:600;color:var(--text)}
+.type-sm-desc{font-size:.66rem;color:var(--muted);margin-top:1px}
+
+.clause-list{display:flex;flex-direction:column;gap:8px}
+.clause-item{
+  display:flex;align-items:flex-start;gap:8px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:10px 12px;
+}
+.clause-num{
+  font-size:.68rem;font-weight:600;color:var(--gold);
+  min-width:18px;padding-top:2px;flex-shrink:0;
+}
+.clause-ta{
+  flex:1;background:transparent;border:none;
+  color:var(--text);font-family:'DM Sans',sans-serif;
+  font-size:.78rem;resize:none;outline:none;min-height:44px;padding:0;
+}
+.clause-del{
+  background:none;border:none;color:var(--muted);
+  cursor:pointer;font-size:.9rem;padding:0 2px;
+  flex-shrink:0;transition:color .15s;
+}
+.clause-del:hover{color:var(--red)}
+.btn-add-clause{
+  width:100%;margin-top:8px;padding:8px;
+  background:transparent;border:1px dashed var(--border-lt);
+  color:var(--muted);border-radius:var(--r);
+  font-size:.76rem;cursor:pointer;
+  transition:border-color .2s,color .2s;
+}
+.btn-add-clause:hover{border-color:var(--gold);color:var(--gold)}
+
+/* Preview side */
+.create-right{}
+.preview-sticky{position:sticky;top:88px}
+.preview-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;
+  margin-bottom:16px;
+}
+.preview-bar{
+  padding:14px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.preview-bar-title{font-size:.78rem;font-weight:600;color:var(--text)}
+.preview-body{padding:24px;background:#131E2C}
+.doc-paper{
+  background:var(--paper);color:var(--ink);
+  padding:40px 44px;border-radius:3px;
+  box-shadow:0 4px 32px rgba(0,0,0,.4);
+  font-size:.84rem;
+}
+.dp-seal{text-align:center;margin-bottom:24px}
+.dp-seal-ring{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:52px;height:52px;border:1.5px solid #C9A84C;
+  border-radius:50%;font-size:1.3rem;color:#C9A84C;
+  margin-bottom:10px;
+}
+.dp-title{
+  font-family:'Playfair Display',serif;
+  font-size:1.4rem;color:var(--ink);
+  line-height:1.2;margin-bottom:4px;
+}
+.dp-sub{font-size:.68rem;color:#666;letter-spacing:.4px}
+.dp-divider{border:none;border-top:1px solid #C9A84C55;margin:18px 0}
+.dp-parties{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+.dp-party{
+  padding:12px;background:#F0EDE6;
+  border-radius:3px;border-left:2px solid #C9A84C;
+}
+.dp-party-lbl{font-size:.6rem;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.dp-party-name{font-family:'Playfair Display',serif;font-size:.95rem;color:var(--ink)}
+.dp-party-addr{font-family:monospace;font-size:.62rem;color:#666;word-break:break-all;margin-top:2px}
+.dp-body{font-size:.78rem;color:#333;line-height:1.7;margin-bottom:14px}
+.dp-clauses{list-style:none;counter-reset:c}
+.dp-clauses li{
+  counter-increment:c;font-size:.74rem;color:#333;
+  line-height:1.6;margin-bottom:8px;padding-left:22px;position:relative;
+}
+.dp-clauses li::before{
+  content:counter(c)".";position:absolute;left:0;
+  font-weight:600;color:#7A6030;font-size:.72rem;
+}
+.dp-hash{
+  margin-top:20px;padding:10px 12px;
+  background:#F0EDE6;border-radius:3px;
+  border:1px dashed #C9A84C88;
+}
+.dp-hash-lbl{font-size:.6rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.dp-hash-val{font-family:monospace;font-size:.62rem;color:#555;word-break:break-all}
+.dp-sigs{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:24px;margin-top:32px;padding-top:20px;
+  border-top:1px solid #ddd;
+}
+.dp-sig-line{
+  border-bottom:1px solid #bbb;height:40px;
+  display:flex;align-items:flex-end;padding-bottom:3px;
+  margin-bottom:5px;
+}
+.dp-sig-stamp{
+  font-family:'Playfair Display',serif;
+  font-style:italic;font-size:1.1rem;color:#1A3A6A;
+  opacity:0;transition:opacity .4s;
+}
+.dp-sig-stamp.vis{opacity:1}
+.dp-sig-meta{font-size:.62rem;color:#999;line-height:1.5}
+
+.btn-generate{
+  width:100%;padding:14px;
+  background:var(--gold);border:none;border-radius:var(--r);
+  color:var(--bg);font-family:'DM Sans',sans-serif;
+  font-weight:600;font-size:.9rem;cursor:pointer;
+  transition:background .2s;
+}
+.btn-generate:hover{background:var(--gold-lt)}
+.btn-generate:disabled{background:var(--border);color:var(--muted);cursor:not-allowed}
+
+/* ════════════════════════════════
+   ALL AGREEMENTS
+════════════════════════════════ */
+#page-agreements{background:var(--bg)}
+.agreements-wrap{max-width:1100px;margin:0 auto;padding:48px}
+
+.agreements-header{
+  display:flex;align-items:flex-start;
+  justify-content:space-between;margin-bottom:32px;gap:20px;
+}
+.agreements-filters{
+  display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;
+}
+.filter-btn{
+  padding:7px 14px;border:1px solid var(--border);
+  border-radius:20px;background:transparent;
+  color:var(--muted);font-family:'DM Sans',sans-serif;
+  font-size:.75rem;cursor:pointer;transition:all .15s;
+}
+.filter-btn:hover,.filter-btn.active{
+  border-color:var(--gold);color:var(--gold);
+  background:rgba(212,168,67,.08);
+}
+
+.agr-table{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;
+}
+.agr-table-head{
+  display:grid;grid-template-columns:2fr 1.2fr 1.2fr 1fr 1fr 80px;
+  padding:12px 20px;
+  border-bottom:1px solid var(--border);
+  background:var(--surface);
+}
+.th{font-size:.68rem;font-weight:600;color:var(--muted);letter-spacing:.4px;text-transform:uppercase}
+.agr-row{
+  display:grid;grid-template-columns:2fr 1.2fr 1.2fr 1fr 1fr 80px;
+  padding:16px 20px;
+  border-bottom:1px solid var(--border);
+  align-items:center;cursor:pointer;
+  transition:background .15s;
+}
+.agr-row:last-child{border-bottom:none}
+.agr-row:hover{background:rgba(212,168,67,.04)}
+.agr-title-cell{}
+.agr-title-text{font-size:.84rem;font-weight:500;color:var(--text);margin-bottom:2px}
+.agr-id-text{font-size:.68rem;color:var(--muted);font-family:monospace}
+.agr-party{font-size:.76rem;color:var(--text)}
+.agr-party-addr{font-size:.66rem;color:var(--muted);font-family:monospace}
+.agr-date{font-size:.76rem;color:var(--muted)}
+.agr-role-badge{
+  padding:3px 8px;border-radius:3px;
+  font-size:.66rem;font-weight:600;
+}
+.role-a{background:rgba(74,158,224,.12);color:var(--blue);border:1px solid rgba(74,158,224,.25)}
+.role-b{background:rgba(212,168,67,.1);color:var(--gold);border:1px solid rgba(212,168,67,.25)}
+
+.badge{padding:3px 10px;border-radius:20px;font-size:.66rem;font-weight:600;letter-spacing:.3px}
+.badge-draft{background:rgba(90,90,90,.2);color:#aaa;border:1px solid #333}
+.badge-pending{background:rgba(224,155,61,.12);color:var(--amber);border:1px solid rgba(224,155,61,.3)}
+.badge-active{background:rgba(61,190,122,.12);color:var(--green);border:1px solid rgba(61,190,122,.3)}
+.badge-voided{background:rgba(224,82,82,.1);color:var(--red);border:1px solid rgba(224,82,82,.25)}
+
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;
+  padding:72px 40px;color:var(--muted);
+}
+.empty-icon{font-size:2.8rem;margin-bottom:16px;opacity:.4}
+.empty-title{
+  font-family:'Playfair Display',serif;
+  font-size:1.3rem;color:var(--text);
+  margin-bottom:8px;opacity:.6;
+}
+.empty-body{font-size:.8rem;line-height:1.6;max-width:260px}
+
+/* ════════════════════════════════
+   AGREEMENT DETAIL
+════════════════════════════════ */
+#page-detail{background:var(--bg)}
+.detail-wrap{max-width:1100px;margin:0 auto;padding:48px}
+.detail-back{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:.78rem;color:var(--muted);cursor:pointer;
+  margin-bottom:28px;transition:color .15s;border:none;background:none;
+  padding:0;
+}
+.detail-back:hover{color:var(--text)}
+
+.detail-header{
+  display:flex;align-items:flex-start;
+  justify-content:space-between;gap:24px;
+  margin-bottom:32px;flex-wrap:wrap;
+}
+.detail-title-group{}
+.detail-type-tag{
+  display:inline-block;
+  font-size:.68rem;font-weight:600;color:var(--gold);
+  background:rgba(212,168,67,.1);border:1px solid rgba(212,168,67,.2);
+  border-radius:3px;padding:3px 10px;margin-bottom:10px;
+  letter-spacing:.5px;
+}
+.detail-h1{
+  font-family:'Playfair Display',serif;
+  font-size:1.8rem;color:var(--text);margin-bottom:4px;
+}
+.detail-meta{font-size:.76rem;color:var(--muted)}
+.detail-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start}
+
+.detail-grid{
+  display:grid;grid-template-columns:2fr 1fr;
+  gap:24px;align-items:start;
+}
+
+.detail-main{}
+.detail-sidebar{}
+
+.d-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);margin-bottom:16px;
+  overflow:hidden;
+}
+.d-card-head{
+  padding:16px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.d-card-title{font-size:.8rem;font-weight:600;color:var(--text)}
+.d-card-body{padding:20px}
+
+.parties-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.party-block{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:16px;
+}
+.party-block-lbl{font-size:.66rem;font-weight:600;color:var(--gold);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.party-block-name{font-size:.9rem;font-weight:500;color:var(--text);margin-bottom:4px}
+.party-block-addr{font-family:monospace;font-size:.7rem;color:var(--muted);word-break:break-all}
+.party-signed{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:.66rem;color:var(--green);margin-top:6px;
+}
+.party-unsigned{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:.66rem;color:var(--muted);margin-top:6px;
+}
+
+.clauses-list{list-style:none;counter-reset:dc}
+.clauses-list li{
+  counter-increment:dc;
+  font-size:.8rem;color:var(--text);line-height:1.7;
+  margin-bottom:12px;padding-left:26px;
+  position:relative;
+}
+.clauses-list li::before{
+  content:counter(dc)".";position:absolute;left:0;
+  font-weight:600;color:var(--gold);font-size:.75rem;
+}
+
+.hash-box{
+  background:var(--surface);border:1px solid var(--border-lt);
+  border-radius:var(--r);padding:14px 16px;
+}
+.hash-lbl{font-size:.66rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.hash-val{font-family:monospace;font-size:.72rem;color:var(--gold);word-break:break-all;line-height:1.5}
+
+/* Timeline */
+.timeline{display:flex;flex-direction:column;gap:0}
+.tl-item{
+  display:flex;gap:14px;
+  padding:14px 0;
+  border-bottom:1px solid var(--border);
+}
+.tl-item:last-child{border-bottom:none;padding-bottom:0}
+.tl-dot{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.75rem;flex-shrink:0;margin-top:1px;
+}
+.tl-dot.done{background:rgba(61,190,122,.15);border:1px solid rgba(61,190,122,.4);color:var(--green)}
+.tl-dot.wait{background:var(--surface);border:1px solid var(--border);color:var(--muted)}
+.tl-dot.active{background:rgba(212,168,67,.1);border:1px solid rgba(212,168,67,.4);color:var(--gold)}
+.tl-text{}
+.tl-label{font-size:.8rem;font-weight:500;color:var(--text);margin-bottom:2px}
+.tl-time{font-size:.68rem;color:var(--muted)}
+
+/* Sign section on detail */
+.sign-section{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:24px;margin-bottom:16px;
+}
+.sign-section-title{
+  font-size:.85rem;font-weight:600;color:var(--text);
+  margin-bottom:4px;
+}
+.sign-section-sub{font-size:.75rem;color:var(--muted);margin-bottom:20px}
+
+.btn-sign{
+  padding:11px 22px;background:var(--gold);border:none;
+  border-radius:var(--r);color:var(--bg);
+  font-family:'DM Sans',sans-serif;font-weight:600;
+  font-size:.82rem;cursor:pointer;transition:background .2s;
+}
+.btn-sign:hover{background:var(--gold-lt)}
+.btn-sign:disabled{background:var(--border);color:var(--muted);cursor:not-allowed}
+.btn-void{
+  padding:11px 22px;background:transparent;
+  border:1px solid var(--red);border-radius:var(--r);
+  color:var(--red);font-family:'DM Sans',sans-serif;
+  font-weight:500;font-size:.82rem;cursor:pointer;
+  transition:background .2s;
+}
+.btn-void:hover{background:rgba(224,82,82,.08)}
+.btn-sm{
+  padding:7px 14px;border-radius:var(--r);
+  font-family:'DM Sans',sans-serif;font-size:.75rem;
+  font-weight:500;cursor:pointer;transition:all .15s;
+}
+.btn-sm-ghost{
+  background:transparent;border:1px solid var(--border-lt);
+  color:var(--muted);
+}
+.btn-sm-ghost:hover{border-color:var(--text);color:var(--text)}
+
+.sig-chip{
+  display:flex;align-items:flex-start;gap:10px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:12px 14px;margin-top:10px;
+}
+.sig-chip-icon{
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(61,190,122,.1);border:1px solid rgba(61,190,122,.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;flex-shrink:0;
+}
+.sig-chip-lbl{font-size:.7rem;color:var(--muted);margin-bottom:3px}
+.sig-chip-val{font-family:monospace;font-size:.68rem;color:var(--green);word-break:break-all;line-height:1.4}
+.sig-chip-time{font-size:.66rem;color:var(--muted);margin-top:2px}
+
+.onchain-block{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;
+}
+.onchain-row{
+  display:flex;justify-content:space-between;
+  align-items:flex-start;gap:12px;
+  padding:10px 14px;border-bottom:1px solid var(--border);
+}
+.onchain-row:last-child{border-bottom:none}
+.onchain-key{font-size:.7rem;color:var(--muted);white-space:nowrap;flex-shrink:0;padding-top:1px}
+.onchain-val{font-family:monospace;font-size:.7rem;color:var(--text);word-break:break-all;text-align:right}
+
+/* Code snippet */
+.code-snip{
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:var(--r);padding:16px;overflow-x:auto;
+}
+.code-snip pre{font-family:monospace;font-size:.7rem;color:#7EC8E3;line-height:1.7;white-space:pre-wrap}
+.ck{color:#C792EA}.cs{color:#C3E88D}.cc{color:#546E7A}.cf{color:#82AAFF}.ct{color:#FFCB6B}
+
+/* ── Notification ── */
+.notif{
+  position:fixed;top:80px;right:20px;
+  background:var(--card);border:1px solid var(--border);
+  border-left:3px solid var(--gold);border-radius:var(--r);
+  padding:14px 18px;font-size:.8rem;
+  max-width:290px;z-index:999;
+  transform:translateX(120%);transition:transform .28s ease;line-height:1.5;
+}
+.notif.show{transform:translateX(0)}
+.notif.error{border-left-color:var(--red)}
+.notif-title{font-weight:600;color:var(--gold);margin-bottom:2px}
+.notif.error .notif-title{color:var(--red)}
+.notif-body{color:var(--muted)}
+
+/* Flex utils */
+.flex-row{display:flex;gap:10px;flex-wrap:wrap}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mt24{margin-top:24px}
+.warn-box{
+  background:rgba(224,155,61,.08);border:1px solid rgba(224,155,61,.3);
+  border-radius:var(--r);padding:12px 14px;font-size:.74rem;color:var(--amber);
+  line-height:1.6;margin-bottom:16px;
+}
+
+@media(max-width:900px){
+  nav{padding:0 20px}
+  .nav-links{display:none}
+  .hero{padding:72px 24px 60px}
+  .stats-strip{flex-wrap:wrap}
+  .stat-item{min-width:120px}
+  .section{padding:60px 24px}
+  .steps-grid{grid-template-columns:1fr 1fr}
+  .features-grid{grid-template-columns:1fr}
+  .types-row{grid-template-columns:1fr 1fr}
+  .cta-banner{flex-direction:column;margin:0 24px 60px;padding:36px 28px}
+  .create-wrap{grid-template-columns:1fr;padding:24px}
+  .create-left{position:static}
+  .agreements-wrap{padding:24px}
+  .detail-wrap{padding:24px}
+  .detail-grid{grid-template-columns:1fr}
+  .parties-grid{grid-template-columns:1fr}
+  .agr-table-head,.agr-row{grid-template-columns:2fr 1fr 1fr}
+  .th:nth-child(n+4),.agr-row>*:nth-child(n+4){display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo" onclick="goPage('landing')">Lex<em>Chain</em></div>
+  <div class="nav-links">
+    <button class="nav-link" onclick="goPage('landing')">Home</button>
+    <button class="nav-link" onclick="goPage('agreements')">My Agreements</button>
+    <button class="nav-link" onclick="goPage('create')">Create</button>
+  </div>
+  <div class="nav-right">
+    <div class="chain-pill" id="chainPill">Botchain </div>
+    <button class="btn-wallet" id="walletBtn" onclick="connectWallet()">
+      <div class="w-dot" id="walletDot"></div>
+      <span id="walletLabel">Connect Wallet</span>
+    </button>
+  </div>
+</nav>
+
+<!-- Notification -->
+<div class="notif" id="notif">
+  <div class="notif-title" id="nTitle"></div>
+  <div class="notif-body" id="nBody"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     LANDING PAGE
+════════════════════════════════════════ -->
+<div class="page active" id="page-landing">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-eyebrow"><span></span> Blockchain-Secured Legal Agreements</div>
+    <h1 class="hero-h1">
+      Agreements that exist<br/><i>on the chain,</i> not just<br/>in a drawer
+    </h1>
+    <p class="hero-sub">
+      Create, sign, and enforce NDAs, land purchase contracts, partnerships and custom agreements — immutably recorded on Botchain with ECDSA signature verification.
+    </p>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="goPage('create')">Create an Agreement</button>
+      <button class="btn-secondary" onclick="goPage('agreements')">View My Agreements</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-strip">
+    <div class="stat-item"><div class="stat-num">4</div><div class="stat-lbl">Agreement types</div></div>
+    <div class="stat-item"><div class="stat-num">ECDSA</div><div class="stat-lbl">Signature standard</div></div>
+    <div class="stat-item"><div class="stat-num">keccak256</div><div class="stat-lbl">Content integrity</div></div>
+    <div class="stat-item"><div class="stat-num">968</div><div class="stat-lbl">Botchain ID</div></div>
+  </div>
+
+  <!-- How it works -->
+  <div class="section">
+    <div class="section-head">
+      <h2 class="section-h2">How it works</h2>
+      <div class="section-rule"></div>
+    </div>
+    <div class="steps-grid">
+      <div class="step-col">
+        <div class="step-num-large">01</div>
+        <div class="step-icon">📝</div>
+        <div class="step-title">Draft your agreement</div>
+        <div class="step-body">Choose a template or build a custom agreement from scratch. Add parties, clauses, jurisdiction, and terms.</div>
+      </div>
+      <div class="step-col">
+        <div class="step-num-large">02</div>
+        <div class="step-icon">🔒</div>
+        <div class="step-title">Hash the content</div>
+        <div class="step-body">The full agreement text is hashed with keccak256, producing a unique fingerprint that is stored on-chain as proof of content.</div>
+      </div>
+      <div class="step-col">
+        <div class="step-num-large">03</div>
+        <div class="step-icon">✍️</div>
+        <div class="step-title">Both parties sign</div>
+        <div class="step-body">Party A signs first, then Party B countersigns. Each ECDSA signature is verified against the content hash on-chain.</div>
+      </div>
+      <div class="step-col">
+        <div class="step-num-large">04</div>
+        <div class="step-icon">⛓️</div>
+        <div class="step-title">Active on-chain</div>
+        <div class="step-body">Once both parties have signed, the agreement status becomes Active and is permanently recorded on Botchain.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="section" style="padding-top:0">
+    <div class="section-head">
+      <h2 class="section-h2">Built for trust</h2>
+      <div class="section-rule"></div>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">🔐</div>
+        <div class="feat-title">Content integrity</div>
+        <div class="feat-body">keccak256 hashing ensures the agreement text can never be altered after signing. Any change produces a different hash.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">✅</div>
+        <div class="feat-title">ECDSA verification</div>
+        <div class="feat-body">Every signature is verified on-chain using <code style="font-size:.75em;color:var(--gold)">ecrecover</code>, proving exactly which wallet signed what content.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📋</div>
+        <div class="feat-title">Status lifecycle</div>
+        <div class="feat-body">Agreements move through Draft → Pending → Active states. Either party can void before both have signed.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🏛️</div>
+        <div class="feat-title">IPFS document storage</div>
+        <div class="feat-body">Full agreement documents are stored on IPFS / Arweave. The URI is recorded on-chain alongside the content hash.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⚡</div>
+        <div class="feat-title">Botchain native</div>
+        <div class="feat-body">Deployed on Botchain (chain ID 968) — fast finality and low fees for legal-grade transactions across Africa.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔍</div>
+        <div class="feat-title">Fully auditable</div>
+        <div class="feat-body">Every action — creation, signing, voiding — emits on-chain events. The full audit trail is always available to both parties.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agreement types -->
+  <div class="section" style="padding-top:0">
+    <div class="section-head">
+      <h2 class="section-h2">Agreement types</h2>
+      <div class="section-rule"></div>
+    </div>
+    <div class="types-row">
+      <div class="type-pill" onclick="goCreate('NDA')">
+        <div class="type-pill-icon">🤝</div>
+        <div class="type-pill-name">NDA</div>
+        <div class="type-pill-desc">Non-Disclosure</div>
+      </div>
+      <div class="type-pill" onclick="goCreate('LandPurchase')">
+        <div class="type-pill-icon">🏡</div>
+        <div class="type-pill-name">Land Purchase</div>
+        <div class="type-pill-desc">Property transfer</div>
+      </div>
+      <div class="type-pill" onclick="goCreate('Partnership')">
+        <div class="type-pill-icon">⚖️</div>
+        <div class="type-pill-name">Partnership</div>
+        <div class="type-pill-desc">Joint venture</div>
+      </div>
+      <div class="type-pill" onclick="goCreate('Custom')">
+        <div class="type-pill-icon">📝</div>
+        <div class="type-pill-name">Custom</div>
+        <div class="type-pill-desc">Build from scratch</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Banner -->
+  <div class="cta-banner">
+    <div class="cta-text">
+      <h3>Ready to sign with confidence?</h3>
+      <p>Create your first on-chain agreement in under 5 minutes. No legal background required.</p>
+    </div>
+    <div class="flex-row">
+      <button class="btn-primary" onclick="goPage('create')">Create Agreement</button>
+      <button class="btn-secondary" onclick="goPage('agreements')">My Agreements</button>
+    </div>
+  </div>
+
+  <footer>
+    <div>Lex<strong>Chain</strong> · On-Chain Agreement Platform · Botchain </div>
+    <div>AgreementVault.sol · MIT License</div>
+  </footer>
+</div>
+
+<!-- ════════════════════════════════════════
+     CREATE AGREEMENT PAGE
+════════════════════════════════════════ -->
+<div class="page" id="page-create">
+  <div class="create-wrap">
+
+    <!-- Left: form -->
+    <div class="create-left">
+      <h1 class="page-heading">New Agreement</h1>
+      <p class="page-sub">Fill in the details, generate the content hash, then submit on-chain and send to the counter-party for signature.</p>
+
+      <div class="form-panel">
+
+        <!-- Type -->
+        <div class="form-section">
+          <div class="form-section-label">Agreement Type</div>
+          <div class="type-grid-sm">
+            <div class="type-sm active" data-type="NDA" onclick="selectCreateType(this)">
+              <div class="type-sm-icon">🤝</div>
+              <div class="type-sm-name">NDA</div>
+              <div class="type-sm-desc">Non-Disclosure</div>
+            </div>
+            <div class="type-sm" data-type="LandPurchase" onclick="selectCreateType(this)">
+              <div class="type-sm-icon">🏡</div>
+              <div class="type-sm-name">Land Purchase</div>
+              <div class="type-sm-desc">Property transfer</div>
+            </div>
+            <div class="type-sm" data-type="Partnership" onclick="selectCreateType(this)">
+              <div class="type-sm-icon">⚖️</div>
+              <div class="type-sm-name">Partnership</div>
+              <div class="type-sm-desc">Joint venture</div>
+            </div>
+            <div class="type-sm" data-type="Custom" onclick="selectCreateType(this)">
+              <div class="type-sm-icon">📝</div>
+              <div class="type-sm-name">Custom</div>
+              <div class="type-sm-desc">From scratch</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parties -->
+        <div class="form-section">
+          <div class="form-section-label">Parties</div>
+          <div class="field"><label>Your Name / Company (Party A)</label>
+            <input type="text" id="f-partyAName" placeholder="Your name or organisation" oninput="livePreview()"/>
+          </div>
+          <div class="field"><label>Your Wallet Address (Party A)</label>
+            <input type="text" id="f-partyAAddr" placeholder="0x…" oninput="livePreview()" readonly/>
+            <div class="field-hint">Filled automatically from your connected wallet.</div>
+          </div>
+          <div class="field"><label>Counterparty Name / Company (Party B)</label>
+            <input type="text" id="f-partyBName" placeholder="Their name or organisation" oninput="livePreview()"/>
+          </div>
+          <div class="field"><label>Counterparty Wallet Address (Party B)</label>
+            <input type="text" id="f-partyBAddr" placeholder="0x…" oninput="livePreview()"/>
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div class="form-section">
+          <div class="form-section-label">Details</div>
+          <div class="field"><label>Title</label>
+            <input type="text" id="f-title" placeholder="Agreement title" oninput="livePreview()"/>
+          </div>
+          <div class="field"><label>Effective Date</label>
+            <input type="date" id="f-date" oninput="livePreview()"/>
+          </div>
+          <div class="field"><label>Governing Jurisdiction</label>
+            <input type="text" id="f-jurisdiction" placeholder="e.g. Nigeria (Lagos State)" oninput="livePreview()"/>
+          </div>
+          <div class="field"><label>Background / Preamble</label>
+            <textarea id="f-preamble" rows="3" placeholder="Context and purpose of this agreement…" oninput="livePreview()"></textarea>
+          </div>
+        </div>
+
+        <!-- Clauses -->
+        <div class="form-section">
+          <div class="form-section-label">Terms &amp; Clauses</div>
+          <div class="clause-list" id="clauseList"></div>
+          <button class="btn-add-clause mt8" onclick="addClause('')">+ Add clause</button>
+        </div>
+
+        <!-- Generate -->
+        <div class="form-section">
+          <button class="btn-generate" id="generateBtn" onclick="generateAndSave()">✦ Hash &amp; Submit On-Chain</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: preview -->
+    <div class="create-right">
+      <div class="preview-sticky">
+        <div class="preview-card">
+          <div class="preview-bar">
+            <div class="preview-bar-title">Live Preview</div>
+            <span id="previewBadge" class="badge badge-draft" style="display:none">Draft</span>
+          </div>
+          <div class="preview-body">
+            <div id="liveDoc">
+              <div style="padding:40px;text-align:center;color:var(--muted);font-size:.8rem">
+                Fill in the form to see your agreement preview
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ALL AGREEMENTS PAGE
+════════════════════════════════════════ -->
+<div class="page" id="page-agreements">
+  <div class="agreements-wrap">
+    <div class="agreements-header">
+      <div>
+        <h1 class="page-heading">My Agreements</h1>
+        <p class="page-sub" style="margin-bottom:0">All agreements where your connected wallet is a party, read live from the contract.</p>
+      </div>
+      <button class="btn-primary" style="white-space:nowrap;flex-shrink:0" onclick="goPage('create')">+ New Agreement</button>
+    </div>
+
+    <div class="agreements-filters" id="filterRow">
+      <button class="filter-btn active" data-filter="all" onclick="filterAgreements(this)">All</button>
+      <button class="filter-btn" data-filter="Draft" onclick="filterAgreements(this)">Draft</button>
+      <button class="filter-btn" data-filter="PendingCounterSign" onclick="filterAgreements(this)">Pending</button>
+      <button class="filter-btn" data-filter="Active" onclick="filterAgreements(this)">Active</button>
+      <button class="filter-btn" data-filter="Voided" onclick="filterAgreements(this)">Voided</button>
+    </div>
+
+    <div class="agr-table">
+      <div class="agr-table-head">
+        <div class="th">Agreement</div>
+        <div class="th">Party A</div>
+        <div class="th">Party B</div>
+        <div class="th">Date</div>
+        <div class="th">Status</div>
+        <div class="th">Role</div>
+      </div>
+      <div id="agreementsList">
+        <div class="empty-state">
+          <div class="empty-icon">📄</div>
+          <div class="empty-title">Connect your wallet</div>
+          <div class="empty-body">Connect a wallet to load agreements from the contract.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     AGREEMENT DETAIL PAGE
+════════════════════════════════════════ -->
+<div class="page" id="page-detail">
+  <div class="detail-wrap">
+    <button class="detail-back" onclick="goPage('agreements')">← Back to agreements</button>
+    <div id="detailContent">
+      <div class="empty-state">No agreement selected.</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+<script>
+// ─────────────────────────────────────────
+//  Contract ABI (AgreementVault.sol)
+// ─────────────────────────────────────────
+const CONTRACT_ABI = [
+	{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"address","name":"signer","type":"address"}],"name":"AlreadySigned","type":"error"},
+	{"inputs":[],"name":"InvalidContentHash","type":"error"},
+	{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"enum AgreementVault.Status","name":"current","type":"uint8"}],"name":"InvalidStatus","type":"error"},
+	{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"address","name":"caller","type":"address"}],"name":"NotAParty","type":"error"},
+	{"inputs":[],"name":"SelfAgreement","type":"error"},
+	{"inputs":[],"name":"ZeroAddress","type":"error"},
+	{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"id","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"AgreementActivated","type":"event"},
+	{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"id","type":"uint256"},{"indexed":false,"internalType":"enum AgreementVault.AgreementType","name":"agreementType","type":"uint8"},{"indexed":true,"internalType":"address","name":"partyA","type":"address"},{"indexed":true,"internalType":"address","name":"partyB","type":"address"},{"indexed":false,"internalType":"bytes32","name":"contentHash","type":"bytes32"}],"name":"AgreementCreated","type":"event"},
+	{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"id","type":"uint256"},{"indexed":true,"internalType":"address","name":"signer","type":"address"},{"indexed":false,"internalType":"uint256","name":"timestamp","type":"uint256"}],"name":"AgreementSigned","type":"event"},
+	{"anonymous":false,"inputs":[{"indexed":true,"internalType":"uint256","name":"id","type":"uint256"},{"indexed":true,"internalType":"address","name":"voidedBy","type":"address"}],"name":"AgreementVoided","type":"event"},
+	{"inputs":[],"name":"agreementCount","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
+	{"inputs":[{"internalType":"uint256","name":"","type":"uint256"}],"name":"agreements","outputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"enum AgreementVault.AgreementType","name":"agreementType","type":"uint8"},{"internalType":"string","name":"title","type":"string"},{"internalType":"bytes32","name":"contentHash","type":"bytes32"},{"internalType":"address","name":"partyA","type":"address"},{"internalType":"address","name":"partyB","type":"address"},{"internalType":"uint256","name":"createdAt","type":"uint256"},{"internalType":"uint256","name":"signedByAAt","type":"uint256"},{"internalType":"uint256","name":"signedByBAt","type":"uint256"},{"internalType":"enum AgreementVault.Status","name":"status","type":"uint8"},{"internalType":"string","name":"metadataURI","type":"string"}],"stateMutability":"view","type":"function"},
+	{"inputs":[{"internalType":"enum AgreementVault.AgreementType","name":"agreementType","type":"uint8"},{"internalType":"string","name":"title","type":"string"},{"internalType":"bytes32","name":"contentHash","type":"bytes32"},{"internalType":"address","name":"partyB","type":"address"},{"internalType":"string","name":"metadataURI","type":"string"}],"name":"createAgreement","outputs":[{"internalType":"uint256","name":"id","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},
+	{"inputs":[{"internalType":"address","name":"party","type":"address"}],"name":"getAgreementsByParty","outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],"stateMutability":"view","type":"function"},
+	{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"bytes","name":"signature","type":"bytes"}],"name":"signAgreement","outputs":[],"stateMutability":"nonpayable","type":"function"},
+	{"inputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"address","name":"","type":"address"}],"name":"signatures","outputs":[{"internalType":"bytes","name":"","type":"bytes"}],"stateMutability":"view","type":"function"},
+	{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"string","name":"content","type":"string"}],"name":"verifyContent","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+	{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"},{"internalType":"address","name":"signer","type":"address"}],"name":"verifySignature","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
+	{"inputs":[{"internalType":"uint256","name":"id","type":"uint256"}],"name":"voidAgreement","outputs":[],"stateMutability":"nonpayable","type":"function"}
+];
+
+const AGREEMENT_TYPES = ['NDA','LandPurchase','Partnership','Custom'];
+const STATUS_NAMES    = ['Draft','PendingCounterSign','Active','Voided'];
+const BOTCHAIN_ID_DEC = 968;
+const BOTCHAIN_ID_HEX = '0x' + BOTCHAIN_ID_DEC.toString(16);
+
+// ─────────────────────────────────────────
+//  ▼▼▼ SET THESE BEFORE DEPLOYING ▼▼▼
+//  Hardcode your deployed AgreementVault address and Botchain RPC URL here.
+//  No UI is needed for this — edit the values directly in this file.
+// ─────────────────────────────────────────
+const CONTRACT_ADDRESS = "0xE7AeEDFE47577a6ddebB5a7F4Ef4b92c82b7134F"; // <-- your deployed AgreementVault address
+const RPC_URL           = "https://rpc.bohr.life";                                          // <-- your Botchain (677) RPC URL, used for wallet_addEthereumChain
+const EXPLORER_URL      = "https://scan.bohr.life";                                          // <-- optional block explorer URL
+// ▲▲▲ ────────────────────────────────── ▲▲▲
+
+const Config = {
+  contractAddress: CONTRACT_ADDRESS,
+  rpcUrl: RPC_URL,
+  explorerUrl: EXPLORER_URL,
+};
+const CONTRACT_CONFIGURED = /^0x[a-fA-F0-9]{40}$/.test(Config.contractAddress) &&
+  Config.contractAddress.toLowerCase() !== "0x0000000000000000000000000000000000000000";
+
+// ─────────────────────────────────────────
+//  App state
+// ─────────────────────────────────────────
+const App = {
+  wallet: null,
+  currentPage: 'landing',
+  agreements: [],          // agreements loaded from chain for the connected wallet
+  createState: {
+    type: 'NDA',
+    clauses: [],
+  },
+  currentDetailId: null,
+};
+
+let provider = null;
+let signer   = null;
+let contract = null;
+
+// Templates (used only to prefill the create form — never sent on-chain as-is until hashed)
+const TEMPLATES = {
+  NDA: {
+    title:'Non-Disclosure Agreement',
+    preamble:'This Non-Disclosure Agreement ("Agreement") is entered into to protect confidential information exchanged between the parties for the purpose of evaluating a potential business relationship.',
+    clauses:[
+      '"Confidential Information" means any data or information, oral or written, disclosed by either party to the other that is designated as confidential or that reasonably should be understood to be confidential given the nature of the information.',
+      'Each party agrees not to disclose, reproduce, or use the other party\'s Confidential Information for any purpose outside the scope of this Agreement without prior written consent.',
+      'The obligations of confidentiality shall remain in effect for a period of three (3) years from the date of disclosure.',
+      'This Agreement shall be governed by and construed in accordance with the laws of the jurisdiction specified herein.',
+    ],
+  },
+  LandPurchase: {
+    title:'Land Purchase Agreement',
+    preamble:'This Land Purchase Agreement sets out the terms and conditions under which the Seller agrees to sell, and the Buyer agrees to purchase, the property described herein.',
+    clauses:[
+      'The Seller agrees to sell and the Buyer agrees to purchase the property described herein, free and clear of all encumbrances except as noted.',
+      'The total purchase price shall be as mutually agreed and documented off-chain, payable in the manner specified by the parties.',
+      'The Seller warrants that they hold clear legal title to the property and have full authority to sell.',
+      'Transfer of ownership shall occur upon receipt of full payment and execution of all required legal instruments.',
+      'The Buyer has conducted due diligence and accepts the property in its current condition unless otherwise agreed in writing.',
+    ],
+  },
+  Partnership: {
+    title:'Business Partnership Agreement',
+    preamble:'This Partnership Agreement establishes the terms of a business partnership between the parties named herein for the purpose of conducting mutually agreed business activities.',
+    clauses:[
+      'The parties agree to establish a partnership for the purpose of jointly conducting business activities as described and agreed upon in writing.',
+      'Profits and losses shall be shared equally between the parties unless otherwise agreed in a signed amendment to this Agreement.',
+      'Each partner shall contribute their agreed resources, expertise, and time as detailed in the attached schedule.',
+      'Major business decisions require the unanimous written consent of all partners.',
+      'Either party may dissolve the partnership upon 90 days written notice to the other party.',
+    ],
+  },
+  Custom: {
+    title:'Custom Agreement',
+    preamble:'This Agreement is entered into between the parties named herein for the purposes set out below.',
+    clauses:[
+      'The parties agree to the terms and conditions set out in this Agreement.',
+      'Any disputes arising from this Agreement shall be resolved through binding arbitration.',
+    ],
+  },
+};
+
+// ─────────────────────────────────────────
+//  Off-chain document cache
+//  The contract only stores contentHash + metadataURI on-chain — it does not
+//  store party names, jurisdiction, preamble or clause text. A production
+//  deployment should pin the full document JSON to IPFS/Arweave and put that
+//  URI in metadataURI. No pinning credentials were provided here, so the
+//  full document is cached locally (keyed by contentHash) and metadataURI is
+//  set to "local:<hash>" as a placeholder. Swap `pinDocument()` below for a
+//  real IPFS/Arweave upload (e.g. via web3.storage or Pinata) to make
+//  documents resolvable by anyone, not just this browser.
+// ─────────────────────────────────────────
+function docCacheKey(hash){ return 'lexchain_doc_' + hash; }
+
+function cacheDocument(hash, doc){
+  try{ localStorage.setItem(docCacheKey(hash), JSON.stringify(doc)); }catch(e){ /* storage full/unavailable — non-fatal */ }
+}
+function getCachedDocument(hash){
+  try{
+    const raw = localStorage.getItem(docCacheKey(hash));
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+async function pinDocument(doc){
+  // Placeholder: no IPFS/Arweave credentials configured.
+  // Replace this with a real upload (web3.storage, Pinata, nft.storage, etc.)
+  // and return the resulting URI, e.g. "ipfs://Qm...".
+  return '';
+}
+
+// ─────────────────────────────────────────
+//  Page routing
+// ─────────────────────────────────────────
+function goPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  App.currentPage = name;
+  window.scrollTo(0,0);
+  if(name==='agreements') renderAgreementsList();
+  if(name==='create') initCreatePage();
+}
+
+function goCreate(type){
+  App.createState.type = type;
+  goPage('create');
+}
+
+function goDetail(id){
+  App.currentDetailId = id;
+  renderDetailPage(id);
+  goPage('detail');
+}
+
+// ─────────────────────────────────────────
+//  Wallet + chain
+// ─────────────────────────────────────────
+async function ensureChain(){
+  const current = await window.ethereum.request({ method:'eth_chainId' });
+  if(current === BOTCHAIN_ID_HEX) return;
+  try{
+    await window.ethereum.request({
+      method:'wallet_switchEthereumChain',
+      params:[{ chainId: BOTCHAIN_ID_HEX }],
+    });
+  }catch(switchErr){
+    if(switchErr.code === 4902){
+      if(!Config.rpcUrl){
+        throw new Error('Wallet is not on Botchain  and no RPC_URL is set in the code, so the network can\'t be auto-added. Switch manually or set RPC_URL at the top of the script.');
+      }
+      await window.ethereum.request({
+        method:'wallet_addEthereumChain',
+        params:[{
+          chainId: BOTCHAIN_ID_HEX,
+          chainName: 'Botchain',
+          nativeCurrency: { name:'Botchain', symbol:'BOT', decimals:18 },
+          rpcUrls: [Config.rpcUrl],
+          blockExplorerUrls: Config.explorerUrl ? [Config.explorerUrl] : [],
+        }],
+      });
+    }else{
+      throw switchErr;
+    }
+  }
+}
+
+async function connectWallet(){
+  const btn   = document.getElementById('walletBtn');
+  const label = document.getElementById('walletLabel');
+  const dot   = document.getElementById('walletDot');
+  const pill  = document.getElementById('chainPill');
+
+  if(App.wallet){
+    // There is no standard programmatic "disconnect" for injected wallets —
+    // this only resets local app state; the wallet itself stays connected
+    // until the user disconnects it from the wallet extension.
+    App.wallet = null; provider = null; signer = null; contract = null;
+    App.agreements = [];
+    btn.classList.remove('connected');
+    dot.style.background='var(--muted)';
+    label.textContent='Connect Wallet';
+    pill.style.display='none';
+    document.getElementById('f-partyAAddr').value = '';
+    renderAgreementsList();
+    return;
+  }
+
+  if(!window.ethereum){
+    notify('No wallet found','Install MetaMask or another injected Ethereum wallet to use LexChain.',true);
+    return;
+  }
+  if(!CONTRACT_CONFIGURED){
+    notify('Contract not configured','Set CONTRACT_ADDRESS at the top of the script to your deployed AgreementVault address.',true);
+    return;
+  }
+
+  try{
+    provider = new ethers.BrowserProvider(window.ethereum);
+    await ensureChain();
+    const accounts = await provider.send('eth_requestAccounts', []);
+    signer = await provider.getSigner();
+    App.wallet = accounts[0];
+    contract = new ethers.Contract(Config.contractAddress, CONTRACT_ABI, signer);
+
+    btn.classList.add('connected');
+    dot.style.background='var(--green)';
+    label.textContent = App.wallet.slice(0,6)+'…'+App.wallet.slice(-4);
+    pill.style.display='block';
+
+    const partyAField = document.getElementById('f-partyAAddr');
+    if(partyAField) partyAField.value = App.wallet;
+
+    notify('Wallet connected', App.wallet.slice(0,10)+'… · Botchain');
+
+    window.ethereum.removeListener?.('accountsChanged', handleAccountsChanged);
+    window.ethereum.removeListener?.('chainChanged', handleChainChanged);
+    window.ethereum.on?.('accountsChanged', handleAccountsChanged);
+    window.ethereum.on?.('chainChanged', handleChainChanged);
+
+    await loadAgreementsFromChain();
+    if(App.currentPage==='agreements') renderAgreementsList();
+  }catch(err){
+    console.error(err);
+    notify('Wallet connection failed', err?.shortMessage || err?.message || 'Unknown error', true);
+  }
+}
+
+function handleAccountsChanged(accounts){
+  if(!accounts || !accounts.length){ 
+    connectWallet(); // triggers the disconnect branch since App.wallet is set
+    return;
+  }
+  window.location.reload();
+}
+function handleChainChanged(){
+  window.location.reload();
+}
+
+// ─────────────────────────────────────────
+//  CREATE PAGE
+// ─────────────────────────────────────────
+function initCreatePage(){
+  const t = TEMPLATES[App.createState.type];
+  document.getElementById('f-title').value        = t.title;
+  document.getElementById('f-preamble').value     = t.preamble;
+  document.getElementById('f-jurisdiction').value = document.getElementById('f-jurisdiction').value || 'Nigeria (Lagos State)';
+  document.getElementById('f-date').value         = document.getElementById('f-date').value || new Date().toISOString().split('T')[0];
+  document.getElementById('f-partyAAddr').value   = App.wallet || '';
+  App.createState.clauses = [...t.clauses];
+  document.querySelectorAll('.type-sm').forEach(el=>{
+    el.classList.toggle('active', el.dataset.type===App.createState.type);
+  });
+  renderCreateClauses();
+  livePreview();
+  updateGenerateButton();
+}
+
+function updateGenerateButton(){
+  const btn = document.getElementById('generateBtn');
+  if(!btn) return;
+  if(!App.wallet){
+    btn.disabled = true;
+    btn.textContent = 'Connect wallet to submit on-chain';
+  }else if(!CONTRACT_CONFIGURED){
+    btn.disabled = true;
+    btn.textContent = 'Set CONTRACT_ADDRESS in code';
+  }else{
+    btn.disabled = false;
+    btn.textContent = '✦ Hash & Submit On-Chain';
+  }
+}
+
+function selectCreateType(el){
+  document.querySelectorAll('.type-sm').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  App.createState.type = el.dataset.type;
+  const t = TEMPLATES[App.createState.type];
+  document.getElementById('f-title').value    = t.title;
+  document.getElementById('f-preamble').value = t.preamble;
+  App.createState.clauses = [...t.clauses];
+  renderCreateClauses();
+  livePreview();
+}
+
+function renderCreateClauses(){
+  const list = document.getElementById('clauseList');
+  list.innerHTML='';
+  App.createState.clauses.forEach((c,i)=>{
+    const div=document.createElement('div');
+    div.className='clause-item';
+    div.innerHTML=`<span class="clause-num">${i+1}.</span>
+      <textarea class="clause-ta" rows="2" oninput="App.createState.clauses[${i}]=this.value;livePreview()">${esc(c)}</textarea>
+      <button class="clause-del" onclick="removeClause(${i})">✕</button>`;
+    list.appendChild(div);
+  });
+}
+
+function addClause(txt){
+  App.createState.clauses.push(txt||'');
+  renderCreateClauses();
+  livePreview();
+}
+
+function removeClause(i){
+  App.createState.clauses.splice(i,1);
+  renderCreateClauses();
+  livePreview();
+}
+
+function getCreateFormData(){
+  return{
+    type:         App.createState.type,
+    title:        v('f-title')        ||'Agreement',
+    partyAName:   v('f-partyAName')   ||'Party A',
+    partyAAddr:   v('f-partyAAddr')   ||App.wallet||'0x0000000000000000000000000000000000000000',
+    partyBName:   v('f-partyBName')   ||'Party B',
+    partyBAddr:   v('f-partyBAddr')   ||'0x0000000000000000000000000000000000000000',
+    date:         v('f-date')         ||new Date().toISOString().split('T')[0],
+    jurisdiction: v('f-jurisdiction') ||'Unspecified',
+    preamble:     v('f-preamble')     ||'',
+    clauses:      [...App.createState.clauses],
+  };
+}
+
+function buildFullText(fd){
+  return[
+    fd.title,
+    `Type: ${fd.type}`,
+    `Effective Date: ${fd.date}`,
+    `Party A: ${fd.partyAName} (${fd.partyAAddr})`,
+    `Party B: ${fd.partyBName} (${fd.partyBAddr})`,
+    `Governing Law: ${fd.jurisdiction}`,
+    `Preamble: ${fd.preamble}`,
+    ...fd.clauses.map((c,i)=>`${i+1}. ${c}`),
+  ].join('\n');
+}
+
+function keccak256Text(text){
+  return ethers.keccak256(ethers.toUtf8Bytes(text));
+}
+
+function livePreview(){
+  const fd=getCreateFormData();
+  document.getElementById('liveDoc').innerHTML=renderDocPaper(fd,null,{A:null,B:null},{A:null,B:null});
+  document.getElementById('previewBadge').style.display='inline-block';
+}
+
+async function generateAndSave(){
+  if(!App.wallet || !contract){
+    notify('Connect wallet','Connect your wallet before submitting an agreement on-chain.',true);
+    return;
+  }
+  const fd=getCreateFormData();
+  if(!ethers.isAddress(fd.partyBAddr)){
+    notify('Invalid address','Enter a valid counter-party wallet address (Party B).',true);
+    return;
+  }
+  if(fd.partyBAddr.toLowerCase()===App.wallet.toLowerCase()){
+    notify('Invalid parties','Party A and Party B cannot be the same address.',true);
+    return;
+  }
+
+  const btn = document.getElementById('generateBtn');
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+
+  try{
+    const fullText   = buildFullText(fd);
+    const contentHash = keccak256Text(fullText);
+
+    // Cache the full document off-chain, keyed by its hash, so the detail
+    // view can render party names/clauses even though the contract itself
+    // only stores the hash. See pinDocument() above for wiring real IPFS.
+    cacheDocument(contentHash, fd);
+    btn.textContent = 'Uploading metadata…';
+    let metadataURI = await pinDocument(fd);
+    if(!metadataURI) metadataURI = 'local:' + contentHash;
+
+    btn.textContent = 'Confirm in wallet…';
+    const typeIndex = AGREEMENT_TYPES.indexOf(fd.type);
+    const tx = await contract.createAgreement(typeIndex, fd.title, contentHash, fd.partyBAddr, metadataURI);
+
+    btn.textContent = 'Waiting for confirmation…';
+    const receipt = await tx.wait();
+
+    let newId = null;
+    for(const log of receipt.logs){
+      try{
+        const parsed = contract.interface.parseLog(log);
+        if(parsed && parsed.name === 'AgreementCreated'){
+          newId = parsed.args.id.toString();
+          break;
+        }
+      }catch(e){ /* not this contract's event */ }
+    }
+
+    notify('Agreement created', newId ? `On-chain as #${newId}.` : 'Transaction confirmed.');
+    await loadAgreementsFromChain();
+    if(newId){
+      goDetail(newId);
+    }else{
+      goPage('agreements');
+    }
+  }catch(err){
+    console.error(err);
+    notify('Transaction failed', err?.shortMessage || err?.reason || err?.message || 'Unknown error', true);
+  }finally{
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+    updateGenerateButton();
+  }
+}
+
+// ─────────────────────────────────────────
+//  Loading agreements from the chain
+// ─────────────────────────────────────────
+async function fetchAgreement(id){
+  const a = await contract.agreements(id);
+  const hash = a.contentHash;
+  const cached = getCachedDocument(hash) || {};
+
+  const sigA = await contract.signatures(id, a.partyA).catch(()=>null);
+  const sigB = await contract.signatures(id, a.partyB).catch(()=>null);
+
+  const createdAtMs   = Number(a.createdAt)   * 1000;
+  const signedAAtMs   = Number(a.signedByAAt) > 0 ? Number(a.signedByAAt) * 1000 : null;
+  const signedBAtMs   = Number(a.signedByBAt) > 0 ? Number(a.signedByBAt) * 1000 : null;
+
+  return {
+    id: a.id.toString(),
+    type: AGREEMENT_TYPES[Number(a.agreementType)] || 'Custom',
+    title: a.title,
+    contentHash: hash,
+    metadataURI: a.metadataURI,
+    partyAAddr: a.partyA,
+    partyBAddr: a.partyB,
+    partyAName: cached.partyAName || shortAddr(a.partyA),
+    partyBName: cached.partyBName || shortAddr(a.partyB),
+    jurisdiction: cached.jurisdiction || '—',
+    preamble: cached.preamble || '',
+    clauses: cached.clauses || [],
+    date: cached.date || new Date(createdAtMs).toISOString().split('T')[0],
+    status: STATUS_NAMES[Number(a.status)] || 'Draft',
+    signatures: {
+      A: sigA && sigA !== '0x' ? sigA : null,
+      B: sigB && sigB !== '0x' ? sigB : null,
+    },
+    timestamps: { A: signedAAtMs, B: signedBAtMs },
+    createdAt: createdAtMs,
+    blockHeight: null,
+    documentCached: !!getCachedDocument(hash),
+  };
+}
+
+async function loadAgreementsFromChain(){
+  if(!contract || !App.wallet) return;
+  try{
+    const ids = await contract.getAgreementsByParty(App.wallet);
+    const results = [];
+    for(const id of ids){
+      try{ results.push(await fetchAgreement(id)); }
+      catch(e){ console.error('Failed to load agreement', id, e); }
+    }
+    results.sort((x,y)=>y.createdAt - x.createdAt);
+    App.agreements = results;
+    if(App.currentPage==='agreements') renderAgreementsList();
+  }catch(err){
+    console.error(err);
+    notify('Could not load agreements', err?.shortMessage || err?.message || 'Unknown error', true);
+  }
+}
+
+// ─────────────────────────────────────────
+//  AGREEMENTS LIST
+// ─────────────────────────────────────────
+let activeFilter='all';
+
+function filterAgreements(btn){
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter=btn.dataset.filter;
+  renderAgreementsList();
+}
+
+function renderAgreementsList(){
+  const list=document.getElementById('agreementsList');
+
+  if(!App.wallet){
+    list.innerHTML=`<div class="empty-state">
+      <div class="empty-icon">🔌</div>
+      <div class="empty-title">Connect your wallet</div>
+      <div class="empty-body">Connect a wallet to load your agreements from the contract.</div>
+    </div>`;
+    return;
+  }
+  if(!CONTRACT_CONFIGURED){
+    list.innerHTML=`<div class="empty-state">
+      <div class="empty-icon">⚙</div>
+      <div class="empty-title">Contract not configured</div>
+      <div class="empty-body">Set CONTRACT_ADDRESS at the top of the script.</div>
+    </div>`;
+    return;
+  }
+
+  let agrs = App.agreements;
+  if(activeFilter!=='all') agrs = agrs.filter(a=>a.status===activeFilter);
+
+  if(!agrs.length){
+    list.innerHTML=`<div class="empty-state">
+      <div class="empty-icon">📄</div>
+      <div class="empty-title">${App.agreements.length?'No matches':'No agreements yet'}</div>
+      <div class="empty-body">${App.agreements.length?'Try a different filter.':'Create your first on-chain agreement.'}</div>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML=agrs.map(a=>{
+    const role = a.partyAAddr.toLowerCase()===App.wallet.toLowerCase() ? 'A' : 'B';
+    return`<div class="agr-row" onclick="goDetail('${a.id}')">
+      <div class="agr-title-cell">
+        <div class="agr-title-text">${esc(a.title)}</div>
+        <div class="agr-id-text">#${a.id} · ${a.type}</div>
+      </div>
+      <div>
+        <div class="agr-party">${esc(a.partyAName)}</div>
+        <div class="agr-party-addr">${a.partyAAddr.slice(0,6)}…${a.partyAAddr.slice(-4)}</div>
+      </div>
+      <div>
+        <div class="agr-party">${esc(a.partyBName)}</div>
+        <div class="agr-party-addr">${a.partyBAddr.slice(0,6)}…${a.partyBAddr.slice(-4)}</div>
+      </div>
+      <div class="agr-date">${new Date(a.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
+      <div>${statusBadge(a.status)}</div>
+      <div><span class="agr-role-badge ${role==='A'?'role-a':'role-b'}">Party ${role}</span></div>
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────
+//  DETAIL PAGE
+// ─────────────────────────────────────────
+function renderDetailPage(id){
+  const a=App.agreements.find(x=>x.id===id);
+  if(!a){
+    document.getElementById('detailContent').innerHTML='<div class="empty-state">Agreement not found. Reload it from the list, or it may belong to another wallet.</div>';
+    return;
+  }
+
+  const typeIndex=AGREEMENT_TYPES.indexOf(a.type);
+  const dateStr=new Date(a.date+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+
+  const isPartyA = App.wallet && a.partyAAddr.toLowerCase()===App.wallet.toLowerCase();
+  const isPartyB = App.wallet && a.partyBAddr.toLowerCase()===App.wallet.toLowerCase();
+
+  const canSignA = isPartyA && !a.signatures.A && a.status!=='Voided' && a.status!=='Active';
+  const canSignB = isPartyB && !a.signatures.B && a.status==='PendingCounterSign';
+  const canVoid  = (isPartyA||isPartyB) && a.status!=='Active' && a.status!=='Voided';
+
+  document.getElementById('detailContent').innerHTML=`
+    ${!a.documentCached?`<div class="warn-box">Full document text (party names, clauses, jurisdiction) isn't cached in this browser — only the on-chain content hash and addresses are shown. Open this agreement from the browser/wallet that created it to see full text, or fetch it from its metadataURI.</div>`:''}
+    <div class="detail-header">
+      <div class="detail-title-group">
+        <div class="detail-type-tag">${a.type}</div>
+        <h1 class="detail-h1">${esc(a.title)}</h1>
+        <div class="detail-meta">Created ${new Date(a.createdAt).toLocaleString()} · #${a.id} · ${esc(a.jurisdiction)}</div>
+      </div>
+      <div class="detail-actions">
+        ${statusBadge(a.status)}
+        ${canVoid?`<button class="btn-sm btn-sm-ghost" onclick="voidAgreement('${a.id}')">Void</button>`:''}
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <!-- Main column -->
+      <div class="detail-main">
+
+        <!-- Document preview -->
+        <div class="d-card">
+          <div class="d-card-head">
+            <div class="d-card-title">Document Preview</div>
+            <span style="font-size:.68rem;color:var(--muted)">Effective ${dateStr}</span>
+          </div>
+          <div class="d-card-body" style="background:#131E2C;padding:24px">
+            ${renderDocPaper(a,a.contentHash,a.signatures,a.timestamps)}
+          </div>
+        </div>
+
+        <!-- Clauses -->
+        <div class="d-card">
+          <div class="d-card-head"><div class="d-card-title">Terms &amp; Clauses</div></div>
+          <div class="d-card-body">
+            ${a.clauses.length?`<ol class="clauses-list">${a.clauses.map(c=>`<li>${esc(c)}</li>`).join('')}</ol>`
+              :`<div style="font-size:.78rem;color:var(--muted)">Clause text isn't cached locally for this agreement — only its keccak256 hash is verifiable on-chain.</div>`}
+          </div>
+        </div>
+
+        <!-- On-chain record -->
+        <div class="d-card">
+          <div class="d-card-head"><div class="d-card-title">On-Chain Record</div></div>
+          <div class="d-card-body" style="padding:0">
+            <div class="onchain-block">
+              <div class="onchain-row"><div class="onchain-key">agreementType</div><div class="onchain-val">${typeIndex} (${a.type})</div></div>
+              <div class="onchain-row"><div class="onchain-key">contentHash</div><div class="onchain-val">${a.contentHash}</div></div>
+              <div class="onchain-row"><div class="onchain-key">metadataURI</div><div class="onchain-val">${esc(a.metadataURI||'—')}</div></div>
+              <div class="onchain-row"><div class="onchain-key">partyA</div><div class="onchain-val">${a.partyAAddr}</div></div>
+              <div class="onchain-row"><div class="onchain-key">partyB</div><div class="onchain-val">${a.partyBAddr}</div></div>
+              <div class="onchain-row"><div class="onchain-key">status</div><div class="onchain-val">${STATUS_NAMES.indexOf(a.status)} (${a.status})</div></div>
+              <div class="onchain-row"><div class="onchain-key">signedByAAt</div><div class="onchain-val">${a.timestamps.A?new Date(a.timestamps.A).toLocaleString():'—'}</div></div>
+              <div class="onchain-row"><div class="onchain-key">signedByBAt</div><div class="onchain-val">${a.timestamps.B?new Date(a.timestamps.B).toLocaleString():'—'}</div></div>
+              <div class="onchain-row"><div class="onchain-key">sig A</div><div class="onchain-val">${a.signatures.A?a.signatures.A.slice(0,34)+'…':'—'}</div></div>
+              <div class="onchain-row"><div class="onchain-key">sig B</div><div class="onchain-val">${a.signatures.B?a.signatures.B.slice(0,34)+'…':'—'}</div></div>
+              <div class="onchain-row"><div class="onchain-key">contract</div><div class="onchain-val">${Config.contractAddress||'—'}</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CLI snippet -->
+        <div class="d-card">
+          <div class="d-card-head"><div class="d-card-title">Verify with Foundry</div></div>
+          <div class="d-card-body">
+            <div class="code-snip"><pre><span class="cc"># Read this agreement directly from the contract</span>
+cast call ${Config.contractAddress||'$CONTRACT'} \\
+  <span class="cs">"agreements(uint256)"</span> ${a.id} \\
+  --rpc-url $RPC_URL
+
+<span class="cc"># Verify a signature on-chain</span>
+cast call ${Config.contractAddress||'$CONTRACT'} \\
+  <span class="cs">"verifySignature(uint256,address)"</span> \\
+  ${a.id} ${isPartyA?a.partyAAddr:a.partyBAddr} \\
+  --rpc-url $RPC_URL</pre></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="detail-sidebar">
+
+        <!-- Parties -->
+        <div class="d-card">
+          <div class="d-card-head"><div class="d-card-title">Parties</div></div>
+          <div class="d-card-body">
+            <div class="parties-grid">
+              <div class="party-block">
+                <div class="party-block-lbl">Party A</div>
+                <div class="party-block-name">${esc(a.partyAName)}</div>
+                <div class="party-block-addr">${a.partyAAddr}</div>
+                ${a.signatures.A
+                  ?`<div class="party-signed">✓ Signed ${new Date(a.timestamps.A).toLocaleTimeString()}</div>`
+                  :`<div class="party-unsigned">○ Awaiting signature</div>`}
+              </div>
+              <div class="party-block">
+                <div class="party-block-lbl">Party B</div>
+                <div class="party-block-name">${esc(a.partyBName)}</div>
+                <div class="party-block-addr">${a.partyBAddr}</div>
+                ${a.signatures.B
+                  ?`<div class="party-signed">✓ Signed ${new Date(a.timestamps.B).toLocaleTimeString()}</div>`
+                  :`<div class="party-unsigned">○ Awaiting signature</div>`}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Signing -->
+        <div class="sign-section">
+          <div class="sign-section-title">Sign Agreement</div>
+          <div class="sign-section-sub">Each party signs the content hash with their connected wallet key.</div>
+
+          <div class="hash-box" style="margin-bottom:16px">
+            <div class="hash-lbl">Content Hash</div>
+            <div class="hash-val">${a.contentHash}</div>
+          </div>
+
+          ${canSignA?`<button class="btn-sign" onclick="signAgreement('${a.id}','A')">✍ Sign as Party A</button>`:''}
+          ${a.signatures.A?`
+            <div class="sig-chip">
+              <div class="sig-chip-icon">✓</div>
+              <div>
+                <div class="sig-chip-lbl">Party A signature</div>
+                <div class="sig-chip-val">${a.signatures.A.slice(0,48)}…</div>
+                <div class="sig-chip-time">${new Date(a.timestamps.A).toLocaleString()}</div>
+              </div>
+            </div>`:''}
+          ${!canSignA&&!a.signatures.A&&a.status!=='Voided'&&!isPartyA?`<div style="font-size:.74rem;color:var(--muted);margin-top:4px">Only Party A's wallet can sign here.</div>`:''}
+          ${!canSignA&&!a.signatures.A&&a.status!=='Voided'&&isPartyA&&a.status==='Active'?`<div style="font-size:.74rem;color:var(--muted);margin-top:4px">Already active.</div>`:''}
+
+          <div style="height:12px"></div>
+
+          ${canSignB?`<button class="btn-sign" onclick="signAgreement('${a.id}','B')">✍ Sign as Party B</button>`:''}
+          ${a.signatures.B?`
+            <div class="sig-chip">
+              <div class="sig-chip-icon">✓</div>
+              <div>
+                <div class="sig-chip-lbl">Party B signature</div>
+                <div class="sig-chip-val">${a.signatures.B.slice(0,48)}…</div>
+                <div class="sig-chip-time">${new Date(a.timestamps.B).toLocaleString()}</div>
+              </div>
+            </div>`:''}
+          ${!canSignB&&!a.signatures.B&&a.status==='Draft'?`<div style="font-size:.74rem;color:var(--muted);margin-top:4px">Party A must sign first.</div>`:''}
+          ${!canSignB&&!a.signatures.B&&a.status==='PendingCounterSign'&&!isPartyB?`<div style="font-size:.74rem;color:var(--muted);margin-top:4px">Only Party B's wallet can countersign.</div>`:''}
+          ${a.status==='Voided'?`<div style="font-size:.74rem;color:var(--red);margin-top:4px">Agreement voided.</div>`:''}
+        </div>
+
+        <!-- Timeline -->
+        <div class="d-card">
+          <div class="d-card-head"><div class="d-card-title">Status Timeline</div></div>
+          <div class="d-card-body" style="padding:0 20px">
+            <div class="timeline">
+              <div class="tl-item">
+                <div class="tl-dot done">✓</div>
+                <div class="tl-text">
+                  <div class="tl-label">Agreement created</div>
+                  <div class="tl-time">${new Date(a.createdAt).toLocaleString()}</div>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot ${a.signatures.A?'done':a.status==='Draft'?'active':'wait'}">${a.signatures.A?'✓':'1'}</div>
+                <div class="tl-text">
+                  <div class="tl-label">Party A signs</div>
+                  <div class="tl-time">${a.timestamps.A?new Date(a.timestamps.A).toLocaleString():'Pending'}</div>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot ${a.signatures.B?'done':a.status==='PendingCounterSign'?'active':'wait'}">${a.signatures.B?'✓':'2'}</div>
+                <div class="tl-text">
+                  <div class="tl-label">Party B countersigns</div>
+                  <div class="tl-time">${a.timestamps.B?new Date(a.timestamps.B).toLocaleString():'Pending'}</div>
+                </div>
+              </div>
+              <div class="tl-item">
+                <div class="tl-dot ${a.status==='Active'?'done':'wait'}">${a.status==='Active'?'✓':a.status==='Voided'?'✕':'3'}</div>
+                <div class="tl-text">
+                  <div class="tl-label">${a.status==='Active'?'Active on-chain':a.status==='Voided'?'Voided':'Awaiting activation'}</div>
+                  <div class="tl-time">${a.status==='Voided'?'Cancelled':'—'}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content hash -->
+        <div class="d-card">
+          <div class="d-card-head"><div class="d-card-title">Integrity</div></div>
+          <div class="d-card-body">
+            <div class="hash-box">
+              <div class="hash-lbl">keccak256 Content Hash</div>
+              <div class="hash-val">${a.contentHash}</div>
+            </div>
+            <div style="font-size:.72rem;color:var(--muted);margin-top:10px;line-height:1.6">
+              This hash uniquely identifies the agreement text. Any modification produces a different hash, making tampering detectable via <code style="color:var(--gold)">verifyContent()</code>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────────
+//  Signing / voiding — real on-chain transactions
+// ─────────────────────────────────────────
+async function signAgreement(id, party){
+  if(!contract || !App.wallet){
+    notify('Connect wallet','Connect your wallet to sign.',true);
+    return;
+  }
+  const a=App.agreements.find(x=>x.id===id);
+  if(!a) return;
+
+  const expectedAddr = party==='A' ? a.partyAAddr : a.partyBAddr;
+  if(App.wallet.toLowerCase() !== expectedAddr.toLowerCase()){
+    notify('Wrong wallet', `This must be signed from ${expectedAddr.slice(0,6)}…${expectedAddr.slice(-4)}.`, true);
+    return;
+  }
+
+  try{
+    // Sign the raw content-hash bytes with EIP-191 personal_sign so the
+    // contract can recover the signer via ECDSA.recover(toEthSignedMessageHash(hash), sig).
+    const signature = await signer.signMessage(ethers.getBytes(a.contentHash));
+
+    const tx = await contract.signAgreement(id, signature);
+    notify('Signature submitted','Waiting for on-chain confirmation…');
+    await tx.wait();
+
+    notify(party==='A' ? 'Party A signed' : 'Agreement Active!',
+           party==='A' ? 'Awaiting counter-signature from Party B.' : 'Both parties signed — agreement is on-chain.');
+
+    const updated = await fetchAgreement(id);
+    const idx = App.agreements.findIndex(x=>x.id===id);
+    if(idx>=0) App.agreements[idx]=updated; else App.agreements.unshift(updated);
+    renderDetailPage(id);
+  }catch(err){
+    console.error(err);
+    notify('Signing failed', err?.shortMessage || err?.reason || err?.message || 'Unknown error', true);
+  }
+}
+
+async function voidAgreement(id){
+  if(!contract || !App.wallet){
+    notify('Connect wallet','Connect your wallet to void this agreement.',true);
+    return;
+  }
+  try{
+    const tx = await contract.voidAgreement(id);
+    notify('Void submitted','Waiting for on-chain confirmation…');
+    await tx.wait();
+    notify('Agreement voided','This agreement has been cancelled on-chain.');
+    const updated = await fetchAgreement(id);
+    const idx = App.agreements.findIndex(x=>x.id===id);
+    if(idx>=0) App.agreements[idx]=updated;
+    renderDetailPage(id);
+  }catch(err){
+    console.error(err);
+    notify('Void failed', err?.shortMessage || err?.reason || err?.message || 'Unknown error', true);
+  }
+}
+
+// ─────────────────────────────────────────
+//  Document paper renderer (shared)
+// ─────────────────────────────────────────
+function renderDocPaper(fd, hash, signatures, timestamps){
+  const dateStr=new Date((fd.date||new Date().toISOString().split('T')[0])+'T00:00:00')
+    .toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  const sigAStamp=signatures.A?`<span class="dp-sig-stamp vis">${esc(fd.partyAName)}</span>`:`<span class="dp-sig-stamp"></span>`;
+  const sigBStamp=signatures.B?`<span class="dp-sig-stamp vis">${esc(fd.partyBName)}</span>`:`<span class="dp-sig-stamp"></span>`;
+  const sigAMeta=timestamps.A?`Signed ${new Date(timestamps.A).toLocaleString()}`:'Awaiting signature';
+  const sigBMeta=timestamps.B?`Signed ${new Date(timestamps.B).toLocaleString()}`:'Awaiting signature';
+
+  return`<div class="doc-paper">
+    <div class="dp-seal">
+      <div class="dp-seal-ring">⚖</div>
+      <div class="dp-title">${esc(fd.title||'Agreement')}</div>
+      <div class="dp-sub">Effective ${dateStr} · ${esc(fd.jurisdiction||'')}</div>
+    </div>
+    <hr class="dp-divider"/>
+    <div class="dp-parties">
+      <div class="dp-party">
+        <div class="dp-party-lbl">Party A</div>
+        <div class="dp-party-name">${esc(fd.partyAName||'Party A')}</div>
+        <div class="dp-party-addr">${esc(fd.partyAAddr||'0x…')}</div>
+      </div>
+      <div class="dp-party">
+        <div class="dp-party-lbl">Party B</div>
+        <div class="dp-party-name">${esc(fd.partyBName||'Party B')}</div>
+        <div class="dp-party-addr">${esc(fd.partyBAddr||'0x…')}</div>
+      </div>
+    </div>
+    ${fd.preamble?`<div class="dp-body" style="font-style:italic;color:#555;margin-bottom:14px;font-size:.76rem">${esc(fd.preamble)}</div>`:''}
+    <hr class="dp-divider"/>
+    ${(fd.clauses&&fd.clauses.length)?`<ol class="dp-clauses">${fd.clauses.map(c=>`<li>${esc(c)}</li>`).join('')}</ol>`:''}
+    ${hash?`<div class="dp-hash"><div class="dp-hash-lbl">Content Hash (keccak256)</div><div class="dp-hash-val">${hash}</div></div>`:''}
+    <div class="dp-sigs">
+      <div>
+        <div class="dp-sig-line">${sigAStamp}</div>
+        <div class="dp-sig-meta"><strong>${esc(fd.partyAName||'Party A')}</strong> · Party A<br>${sigAMeta}</div>
+      </div>
+      <div>
+        <div class="dp-sig-line">${sigBStamp}</div>
+        <div class="dp-sig-meta"><strong>${esc(fd.partyBName||'Party B')}</strong> · Party B<br>${sigBMeta}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─────────────────────────────────────────
+//  Helpers
+// ─────────────────────────────────────────
+function statusBadge(s){
+  const map={
+    Draft:`<span class="badge badge-draft">Draft</span>`,
+    PendingCounterSign:`<span class="badge badge-pending">Pending</span>`,
+    Active:`<span class="badge badge-active">Active</span>`,
+    Voided:`<span class="badge badge-voided">Voided</span>`,
+  };
+  return map[s]||'';
+}
+
+function shortAddr(addr){
+  if(!addr) return '—';
+  return addr.slice(0,6)+'…'+addr.slice(-4);
+}
+
+function v(id){return document.getElementById(id)?.value||''}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+let notifTimer;
+function notify(title,body,isError){
+  clearTimeout(notifTimer);
+  document.getElementById('nTitle').textContent=title;
+  document.getElementById('nBody').textContent=body;
+  const n=document.getElementById('notif');
+  n.classList.toggle('error', !!isError);
+  n.classList.add('show');
+  notifTimer=setTimeout(()=>n.classList.remove('show'),4400);
+}
+
+// Init — no demo/mock agreements. Everything is read from the chain once a
+// wallet is connected and a contract address is configured.
+window.addEventListener('DOMContentLoaded',()=>{
+  if(!CONTRACT_CONFIGURED){
+    setTimeout(()=>notify('Set up your contract','Edit CONTRACT_ADDRESS (and RPC_URL) near the top of the <script> tag before using this app.'), 600);
+  }
+  initCreatePage();
+  updateGenerateButton();
+});
+</script>
+</body>
+</html>
