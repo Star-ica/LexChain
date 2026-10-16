@@ -743,7 +743,7 @@ footer{
     <button class="nav-link" onclick="goPage('create')">Create</button>
   </div>
   <div class="nav-right">
-    <div class="chain-pill" id="chainPill">Botchain </div>
+    <div class="chain-pill" id="chainPill">BOT Chain · 677</div>
     <button class="btn-wallet" id="walletBtn" onclick="connectWallet()">
       <div class="w-dot" id="walletDot"></div>
       <span id="walletLabel">Connect Wallet</span>
@@ -849,7 +849,7 @@ footer{
       <div class="feat-card">
         <div class="feat-icon">⚡</div>
         <div class="feat-title">Botchain native</div>
-        <div class="feat-body">Deployed on Botchain (chain ID 968) — fast finality and low fees for legal-grade transactions across Africa.</div>
+        <div class="feat-body">Deployed on Botchain (chain ID 677) — fast finality and low fees for legal-grade transactions across Africa.</div>
       </div>
       <div class="feat-card">
         <div class="feat-icon">🔍</div>
@@ -902,8 +902,14 @@ footer{
   </div>
 
   <footer>
-    <div>Lex<strong>Chain</strong> · On-Chain Agreement Platform · Botchain </div>
-    <div>AgreementVault.sol · MIT License</div>
+    <div>Lex<strong>Chain</strong> · On-Chain Agreement Platform · BOT Chain (677)</div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;">
+      <span>AgreementVault.sol · MIT License</span>
+      <span style="opacity:.35">·</span>
+      <a href="http://botchain.ai" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">botchain.ai</a>
+      <span style="opacity:.35">·</span>
+      <a href="http://scan.botchain.ai" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Block Explorer</a>
+    </div>
   </footer>
 </div>
 
@@ -1100,7 +1106,7 @@ const CONTRACT_ABI = [
 
 const AGREEMENT_TYPES = ['NDA','LandPurchase','Partnership','Custom'];
 const STATUS_NAMES    = ['Draft','PendingCounterSign','Active','Voided'];
-const BOTCHAIN_ID_DEC = 968;
+const BOTCHAIN_ID_DEC = 677;
 const BOTCHAIN_ID_HEX = '0x' + BOTCHAIN_ID_DEC.toString(16);
 
 // ─────────────────────────────────────────
@@ -1108,9 +1114,9 @@ const BOTCHAIN_ID_HEX = '0x' + BOTCHAIN_ID_DEC.toString(16);
 //  Hardcode your deployed AgreementVault address and Botchain RPC URL here.
 //  No UI is needed for this — edit the values directly in this file.
 // ─────────────────────────────────────────
-const CONTRACT_ADDRESS = "0xE7AeEDFE47577a6ddebB5a7F4Ef4b92c82b7134F"; // <-- your deployed AgreementVault address
-const RPC_URL           = "https://rpc.bohr.life";                                          // <-- your Botchain (677) RPC URL, used for wallet_addEthereumChain
-const EXPLORER_URL      = "https://scan.bohr.life";                                          // <-- optional block explorer URL
+const CONTRACT_ADDRESS = "0xb2a6A2831885834eb4B4852355aA4B2F1571Ee22"; // <-- your deployed AgreementVault address
+const RPC_URL           = "https://rpc.botchain.ai";                                          // <-- your BOT Chain (677) RPC URL, used for wallet_addEthereumChain
+const EXPLORER_URL      = "https://scan.botchain.ai";                                         // <-- optional block explorer URL
 // ▲▲▲ ────────────────────────────────── ▲▲▲
 
 const Config = {
@@ -1213,6 +1219,118 @@ async function pinDocument(doc){
 }
 
 // ─────────────────────────────────────────
+//  Party-to-party content sharing: export what this browser has cached,
+//  and let the other party import + cryptographically verify it against
+//  the on-chain contentHash before it's ever displayed or trusted.
+// ─────────────────────────────────────────
+function buildDocFromAgreement(a){
+  return {
+    type: a.type,
+    title: a.title,
+    partyAName: a.partyAName,
+    partyBName: a.partyBName,
+    date: a.date,
+    jurisdiction: a.jurisdiction,
+    preamble: a.preamble,
+    clauses: a.clauses,
+  };
+}
+
+function exportDocJSONString(id){
+  const a = App.agreements.find(x=>x.id===id);
+  if(!a || !a.documentCached) return null;
+  return JSON.stringify(buildDocFromAgreement(a), null, 2);
+}
+
+async function copyDocJSON(id){
+  const json = exportDocJSONString(id);
+  if(!json){ notify('Nothing to copy','No content is loaded for this agreement.',true); return; }
+  try{
+    await navigator.clipboard.writeText(json);
+    notify('Copied to clipboard','Send this JSON to the other party — they can paste it in to view and verify it.');
+  }catch(e){
+    notify('Copy failed','Your browser blocked clipboard access. Try Download instead.',true);
+  }
+}
+
+function downloadDocJSON(id){
+  const json = exportDocJSONString(id);
+  if(!json){ notify('Nothing to download','No content is loaded for this agreement.',true); return; }
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `lexchain-agreement-${id}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+async function importAndVerifyDocument(id){
+  const a = App.agreements.find(x=>x.id===id);
+  if(!a) return;
+  const msgEl   = document.getElementById(`importDocMsg-${id}`);
+  const inputEl = document.getElementById(`importDocInput-${id}`);
+  if(!msgEl || !inputEl) return;
+
+  msgEl.style.color = 'var(--muted)';
+  msgEl.textContent = 'Checking…';
+
+  let parsed;
+  try{
+    parsed = JSON.parse(inputEl.value);
+  }catch(e){
+    msgEl.style.color = 'var(--red)';
+    msgEl.textContent = 'That isn\'t valid JSON — paste the exact file/text the other party exported.';
+    return;
+  }
+
+  // Party addresses and type come from the chain, never from the pasted
+  // JSON, so a party can't spoof who the agreement is with.
+  const fd = {
+    type: a.type,
+    title: String(parsed.title || ''),
+    partyAName: String(parsed.partyAName || ''),
+    partyAAddr: a.partyAAddr,
+    partyBName: String(parsed.partyBName || ''),
+    partyBAddr: a.partyBAddr,
+    date: String(parsed.date || a.date),
+    jurisdiction: String(parsed.jurisdiction || ''),
+    preamble: String(parsed.preamble || ''),
+    clauses: Array.isArray(parsed.clauses) ? parsed.clauses.map(String) : [],
+  };
+
+  const fullText = buildFullText(fd);
+  const hash = keccak256Text(fullText);
+
+  if(hash.toLowerCase() !== a.contentHash.toLowerCase()){
+    msgEl.style.color = 'var(--red)';
+    msgEl.textContent = 'Hash mismatch — this content does not match what was signed on-chain (contentHash differs). It may have been altered, or a field like date/jurisdiction/title differs from the original text.';
+    return;
+  }
+
+  // Belt-and-braces: also ask the contract itself, if connected.
+  if(contract){
+    try{
+      const onChainOk = await contract.verifyContent(id, fullText);
+      if(!onChainOk){
+        msgEl.style.color = 'var(--red)';
+        msgEl.textContent = 'Local hash matched, but the contract\'s verifyContent() check failed. Treat this content as unverified.';
+        return;
+      }
+    }catch(e){ /* verifyContent is a bonus check; the local hash match above is already proof */ }
+  }
+
+  cacheDocument(hash, fd);
+  const idx = App.agreements.findIndex(x=>x.id===id);
+  if(idx>=0) App.agreements[idx] = { ...App.agreements[idx], ...fd, documentCached:true };
+
+  notify('Content verified','It matches the on-chain hash exactly — loaded below.');
+  renderDetailPage(id);
+}
+
+// ─────────────────────────────────────────
 //  Page routing
 // ─────────────────────────────────────────
 function goPage(name){
@@ -1249,14 +1367,14 @@ async function ensureChain(){
   }catch(switchErr){
     if(switchErr.code === 4902){
       if(!Config.rpcUrl){
-        throw new Error('Wallet is not on Botchain  and no RPC_URL is set in the code, so the network can\'t be auto-added. Switch manually or set RPC_URL at the top of the script.');
+        throw new Error('Wallet is not on BOT Chain (677) and no RPC_URL is set in the code, so the network can\'t be auto-added. Switch manually or set RPC_URL at the top of the script.');
       }
       await window.ethereum.request({
         method:'wallet_addEthereumChain',
         params:[{
           chainId: BOTCHAIN_ID_HEX,
-          chainName: 'Botchain',
-          nativeCurrency: { name:'Botchain', symbol:'BOT', decimals:18 },
+          chainName: 'BOT Chain',
+          nativeCurrency: { name:'BOT Chain', symbol:'BOT', decimals:18 },
           rpcUrls: [Config.rpcUrl],
           blockExplorerUrls: Config.explorerUrl ? [Config.explorerUrl] : [],
         }],
@@ -1313,7 +1431,7 @@ async function connectWallet(){
     const partyAField = document.getElementById('f-partyAAddr');
     if(partyAField) partyAField.value = App.wallet;
 
-    notify('Wallet connected', App.wallet.slice(0,10)+'… · Botchain');
+    notify('Wallet connected', App.wallet.slice(0,10)+'… · BOT Chain (677)');
 
     window.ethereum.removeListener?.('accountsChanged', handleAccountsChanged);
     window.ethereum.removeListener?.('chainChanged', handleChainChanged);
@@ -1660,7 +1778,6 @@ function renderDetailPage(id){
   const canVoid  = (isPartyA||isPartyB) && a.status!=='Active' && a.status!=='Voided';
 
   document.getElementById('detailContent').innerHTML=`
-    ${!a.documentCached?`<div class="warn-box">Full document text (party names, clauses, jurisdiction) isn't cached in this browser — only the on-chain content hash and addresses are shown. Open this agreement from the browser/wallet that created it to see full text, or fetch it from its metadataURI.</div>`:''}
     <div class="detail-header">
       <div class="detail-title-group">
         <div class="detail-type-tag">${a.type}</div>
@@ -1676,6 +1793,33 @@ function renderDetailPage(id){
     <div class="detail-grid">
       <!-- Main column -->
       <div class="detail-main">
+
+        <!-- Agreement content: view / import / export -->
+        <div class="d-card">
+          <div class="d-card-head">
+            <div class="d-card-title">Agreement Content</div>
+            ${a.documentCached?`<span style="font-size:.68rem;color:var(--green);font-weight:600">✓ Verified against on-chain hash</span>`:`<span style="font-size:.68rem;color:var(--amber);font-weight:600">Not loaded in this browser</span>`}
+          </div>
+          <div class="d-card-body">
+            ${a.documentCached?`
+              <div style="font-size:.78rem;color:var(--muted);line-height:1.6;margin-bottom:16px">
+                This browser holds the full agreement text below, and it hashes to exactly the value recorded on-chain. Share it with the other party so they can view and independently verify it too.
+              </div>
+              <div class="flex-row">
+                <button class="btn-sm btn-sm-ghost" onclick="copyDocJSON('${a.id}')">📋 Copy JSON</button>
+                <button class="btn-sm btn-sm-ghost" onclick="downloadDocJSON('${a.id}')">⬇ Download .json</button>
+              </div>
+            `:`
+              <div class="warn-box">Only the on-chain content hash and addresses are visible here — full text (party names, clauses, jurisdiction) isn't cached in this browser. Ask whoever created this agreement to export its content (Copy/Download JSON) and paste it below — it's checked against the on-chain hash before it's shown, so nothing can be faked.</div>
+              <div class="field">
+                <label>Paste Agreement JSON</label>
+                <textarea id="importDocInput-${a.id}" rows="6" placeholder='{"title":"...","partyAName":"...","partyBName":"...","jurisdiction":"...","preamble":"...","clauses":["..."],"date":"YYYY-MM-DD"}'></textarea>
+              </div>
+              <button class="btn-sign" onclick="importAndVerifyDocument('${a.id}')">🔎 Verify &amp; Load Content</button>
+              <div id="importDocMsg-${a.id}" style="font-size:.72rem;margin-top:10px;line-height:1.6"></div>
+            `}
+          </div>
+        </div>
 
         <!-- Document preview -->
         <div class="d-card">
