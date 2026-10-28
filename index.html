@@ -1385,53 +1385,62 @@ async function ensureChain(){
   }
 }
 
-async function connectWallet(){
+async function connectWallet(silent = false) {
   const btn   = document.getElementById('walletBtn');
   const label = document.getElementById('walletLabel');
   const dot   = document.getElementById('walletDot');
   const pill  = document.getElementById('chainPill');
 
-  if(App.wallet){
-    // There is no standard programmatic "disconnect" for injected wallets —
-    // this only resets local app state; the wallet itself stays connected
-    // until the user disconnects it from the wallet extension.
+  // Disconnect branch
+  if (!silent && App.wallet) {
     App.wallet = null; provider = null; signer = null; contract = null;
     App.agreements = [];
     btn.classList.remove('connected');
-    dot.style.background='var(--muted)';
-    label.textContent='Connect Wallet';
-    pill.style.display='none';
+    dot.style.background = 'var(--muted)';
+    label.textContent = 'Connect Wallet';
+    pill.style.display = 'none';
     document.getElementById('f-partyAAddr').value = '';
     renderAgreementsList();
     return;
   }
 
-  if(!window.ethereum){
-    notify('No wallet found','Install MetaMask or another injected Ethereum wallet to use LexChain.',true);
+  if (!window.ethereum) {
+    if (!silent) notify('No wallet found', 'Install MetaMask or another injected Ethereum wallet to use LexChain.', true);
     return;
   }
-  if(!CONTRACT_CONFIGURED){
-    notify('Contract not configured','Set CONTRACT_ADDRESS at the top of the script to your deployed AgreementVault address.',true);
+  if (!CONTRACT_CONFIGURED) {
+    if (!silent) notify('Contract not configured', 'Set CONTRACT_ADDRESS at the top of the script to your deployed AgreementVault address.', true);
     return;
   }
 
-  try{
+  try {
     provider = new ethers.BrowserProvider(window.ethereum);
+
+    if (silent) {
+      // Never triggers a popup — returns [] if not previously approved
+      const accounts = await provider.send('eth_accounts', []);
+      if (!accounts.length) return;
+    } else {
+      // Triggers MetaMask popup — accounts FIRST, then chain switch
+      await provider.send('eth_requestAccounts', []);
+    }
+
+    // Chain switch only AFTER accounts are available
     await ensureChain();
-    const accounts = await provider.send('eth_requestAccounts', []);
-    signer = await provider.getSigner();
-    App.wallet = accounts[0];
-    contract = new ethers.Contract(Config.contractAddress, CONTRACT_ABI, signer);
+
+    signer     = await provider.getSigner();
+    App.wallet = await signer.getAddress();
+    contract   = new ethers.Contract(Config.contractAddress, CONTRACT_ABI, signer);
 
     btn.classList.add('connected');
-    dot.style.background='var(--green)';
-    label.textContent = App.wallet.slice(0,6)+'…'+App.wallet.slice(-4);
-    pill.style.display='block';
+    dot.style.background = 'var(--green)';
+    label.textContent    = App.wallet.slice(0, 6) + '…' + App.wallet.slice(-4);
+    pill.style.display   = 'block';
 
     const partyAField = document.getElementById('f-partyAAddr');
-    if(partyAField) partyAField.value = App.wallet;
+    if (partyAField) partyAField.value = App.wallet;
 
-    notify('Wallet connected', App.wallet.slice(0,10)+'… · BOT Chain (677)');
+    if (!silent) notify('Wallet connected', App.wallet.slice(0, 10) + '… · BOT Chain (677)');
 
     window.ethereum.removeListener?.('accountsChanged', handleAccountsChanged);
     window.ethereum.removeListener?.('chainChanged', handleChainChanged);
@@ -1439,13 +1448,14 @@ async function connectWallet(){
     window.ethereum.on?.('chainChanged', handleChainChanged);
 
     await loadAgreementsFromChain();
-    if(App.currentPage==='agreements') renderAgreementsList();
-  }catch(err){
-    console.error(err);
-    notify('Wallet connection failed', err?.shortMessage || err?.message || 'Unknown error', true);
+    if (App.currentPage === 'agreements') renderAgreementsList();
+  } catch (err) {
+    if (!silent) {
+      console.error(err);
+      notify('Wallet connection failed', err?.shortMessage || err?.message || 'Unknown error', true);
+    }
   }
 }
-
 function handleAccountsChanged(accounts){
   if(!accounts || !accounts.length){ 
     connectWallet(); // triggers the disconnect branch since App.wallet is set
@@ -2142,12 +2152,22 @@ function notify(title,body,isError){
 
 // Init — no demo/mock agreements. Everything is read from the chain once a
 // wallet is connected and a contract address is configured.
-window.addEventListener('DOMContentLoaded',()=>{
-  if(!CONTRACT_CONFIGURED){
-    setTimeout(()=>notify('Set up your contract','Edit CONTRACT_ADDRESS (and RPC_URL) near the top of the <script> tag before using this app.'), 600);
+// Nav button — keep the disconnect toggle on manual click only
+document.getElementById('walletBtn').onclick = () => connectWallet(false);
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (!CONTRACT_CONFIGURED) {
+    setTimeout(() => notify('Set up your contract', 'Edit CONTRACT_ADDRESS (and RPC_URL) near the top of the <script> tag before using this app.'), 600);
   }
   initCreatePage();
   updateGenerateButton();
+
+  // Auto-connect silently if this site was previously approved
+  if (window.ethereum) {
+    connectWallet(true);
+    window.ethereum.on?.('accountsChanged', handleAccountsChanged);
+    window.ethereum.on?.('chainChanged', handleChainChanged);
+  }
 });
 </script>
 </body>
